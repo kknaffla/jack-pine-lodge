@@ -36,4 +36,6 @@ One web app for Jack Pine Lodge (lodge, cabins, campground, kitchen, golf course
 - ✅ Schema + rules: 132 checks pass on local Postgres; the live-editor variant passes locally too.
 - ✅ Screens for Kevin, Nick, Pete pass the headless test at 390 px and 1280 px (no JS errors, no sideways scroll).
 - ✅ Feed `check` reads the real files: 1,028 charge rows, counts match the bookkeeping tool.
-- ⬜ Supabase project, live rules test, logins, live feed run, Pages config, hand-off of morning-run commands.
+- ✅ Repo `kknaffla/jack-pine-lodge` (public) and Pages live at https://kknaffla.github.io/jack-pine-lodge/ (Oct 26).
+- ✅ Backup folder (Kevin, Oct 26): OneDrive › Claude Working Folder › Jack Pine Lodge App Backups, one dated folder per night; the job deletes nothing.
+- ⬜ Supabase project, live rules test, logins, live feed run, hand-off of morning-run commands.
