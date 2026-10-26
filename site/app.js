@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const APP_VERSION = '2026.10.26-5'; // keep in sync with the ?v= tags in index.html
+  const APP_VERSION = '2026.10.26-6'; // keep in sync with the ?v= tags in index.html
   const CFG = window.APP_CONFIG || {};
   const TZ = CFG.TIME_ZONE || 'America/Detroit';
   const $app = document.getElementById('app');

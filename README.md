@@ -74,6 +74,8 @@ python3 feed/jpl_feed.py check     # read every input, print counts; no network
 python3 feed/jpl_feed.py push      # morning files -> app
 python3 feed/jpl_feed.py export    # app answers -> ~/Bookkeeping/data/feed/app/
 python3 feed/jpl_feed.py backup    # app data + payroll photos -> BACKUP_DIR/<date>/
+python3 feed/jpl_feed.py stage <files...>     # copy files a Claude run saved into the inbox (names must match)
+python3 feed/jpl_feed.py stage --tasks <dir>  # launch pad tasks (ArtifactData out_dir) -> tasks_launchpad.json
 ```
 Inputs: the bookkeeping tool's own files (`data/feed/...`, `data/camplife/...`, `data/status/...`, `jpl attention`) plus copies the Claude morning runs save to `~/Bookkeeping/data/feed/app/in/` (Square sales files, payroll hours, cash drawer, time clock, bank tiles, Monday brief, launch pad tasks). Outputs: answers in `data/feed/app/answers/<kevin|nick|pete>/items/`, which `jpl feed-answers` merges with the pages' answers, and fixes, payroll asks, schedules, tasks and the daily close in `data/feed/app/out/`. The scheduled tasks run these commands; Kevin approves any permission change.
 

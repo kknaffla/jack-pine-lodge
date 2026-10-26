@@ -46,7 +46,7 @@
   function attention() {
     const items = [];
     const add = (lvl, text, href) => items.push({ lvl, text, href });
-    D('attention').filter((a) => a.audience === 'kevin').forEach((a) => add(a.level, (a.count > 1 ? a.count + ' ' : '') + a.label, a.link === 'feed' || a.link === 'charges' ? '#/cards' : null));
+    D('attention').filter((a) => a.audience === 'kevin').forEach((a) => add(a.level, (a.count != null && /^[a-z]/.test(a.label) ? a.count + ' ' : '') + a.label, a.link === 'feed' || a.link === 'charges' ? '#/cards' : null));
     const pend = D('fixes').filter((f) => f.status === 'pending').length;
     if (pend) add('warn', pend + (pend === 1 ? ' timecard fix' : ' timecard fixes') + ' to make in Square', '#/timecards');
     const pp = A.payPeriods(); const cur = pp.cur;

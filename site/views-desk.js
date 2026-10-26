@@ -110,7 +110,7 @@
     const att = D('attention').filter((a) => a.audience === 'nick');
     const at = att.reduce((m, a) => (a.as_of && a.as_of > m ? a.as_of : m), '');
     if (isStale(at || D('timecards').reduce((m, c) => (c.as_of && c.as_of > m ? c.as_of : m), ''))) add('warn', 'morning update is late, tell Kevin');
-    att.forEach((a) => add(a.level, (a.count > 1 ? a.count + ' ' : '') + a.label, a.link === 'charges' ? '#/charges' : null));
+    att.forEach((a) => add(a.level, (a.count != null && /^[a-z]/.test(a.label) ? a.count + ' ' : '') + a.label, a.link === 'charges' ? '#/charges' : null));
     const rank = { crit: 0, warn: 1, wait: 2, good: 3 };
     return items.sort((a, b) => rank[a.lvl] - rank[b.lvl]).map((i) => (i.href ? `<a class="a" href="${i.href}">${i.html}</a>` : `<span class="a">${i.html}</span>`)).join('');
   }

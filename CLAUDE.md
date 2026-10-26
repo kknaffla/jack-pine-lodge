@@ -33,9 +33,10 @@ One web app for Jack Pine Lodge (lodge, cabins, campground, kitchen, golf course
 - Commit messages: short and imperative.
 
 ## Status (Oct 26, 2026)
-- ✅ Schema + rules: 132 checks pass on local Postgres; the live-editor variant passes locally too.
-- ✅ Screens for Kevin, Nick, Pete pass the headless test at 390 px and 1280 px (no JS errors, no sideways scroll).
-- ✅ Feed `check` reads the real files: 1,028 charge rows, counts match the bookkeeping tool.
-- ✅ Repo `kknaffla/jack-pine-lodge` (public) and Pages live at https://kknaffla.github.io/jack-pine-lodge/ (Oct 26).
-- ✅ Backup folder (Kevin, Oct 26): OneDrive › Claude Working Folder › Jack Pine Lodge App Backups, one dated folder per night; the job deletes nothing.
-- ⬜ Supabase project, live rules test, logins, live feed run, hand-off of morning-run commands.
+- ✅ Supabase org "Jack Pine Lodge" (Free), project `jack-pine-lodge` (East US, ref aizbhzikpniaevcynhxw). Sign-ups off; Data API on, tables not auto-exposed, automatic RLS on; Site URL = the Pages address.
+- ✅ Schema + rules: 132 checks pass locally and on the live project (Oct 26). Signed-out requests get 401 on every table.
+- ✅ Logins: Kevin (kevin), the feed (kknaffla+jplfeed@gmail.com, role feed; password only in feed/feed.env), Nick (nick). Pete: none yet (Kevin codes Pete's cards for now).
+- ✅ Feed live: push, export, backup and stage all run on real files (1,028 charges, 3,697 sales day×category rows, timecards, drawers, briefs, launch pad tasks). Second push is idempotent.
+- ✅ Screens for Kevin pass on real data; headless tests 104 pass at 390/1280 px. Reopening while signed in works (fixed Oct 26: SIGNED_IN + INITIAL_SESSION started the app twice).
+- ⬜ Morning runs wired (commands sent to session local_c863bd6b Oct 26; Kevin approves the edits and the permission entry). Until then the app's data is only as fresh as the last manual push.
+- Note: Supabase's built-in email reaches only the org's members (Kevin). Nick and Pete change passwords in More → Change password.

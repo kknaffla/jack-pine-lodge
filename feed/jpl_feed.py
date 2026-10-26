@@ -5,6 +5,8 @@
     python3 feed/jpl_feed.py export    answers entered in the app      -> files the bookkeeping tool reads
     python3 feed/jpl_feed.py backup    everything people entered here  -> dated folder in the OneDrive backup folder
     python3 feed/jpl_feed.py check     read every input and print counts; no network, writes nothing
+    python3 feed/jpl_feed.py stage F.. copy files a Claude run saved (scratchpad) into the inbox; no network
+    python3 feed/jpl_feed.py stage --tasks DIR   launch pad tasks exported with ArtifactData out_dir -> inbox
 
 Never calls QuickBooks or Square. Signs in as the app's "feed" login (role feed): it can write the
 feed tables and read everyone's answers, nothing else (see supabase/schema.sql). Settings come from
@@ -337,6 +339,10 @@ def build_camplife(env):
 
 
 # ------------------------------------------------------------------ build: files the Claude runs save (data/feed/app/in)
+INBOX_NAMES = ("square_day_cat.json", "square_mix.json", "payroll_lines.json", "drawers.json", "timeclock.json", "tiles.json",
+               "brief.json", "brief_gm.json", "tasks_launchpad.json")
+
+
 def inbox(env, name):
     return read_json(bk(env, "data", "feed", "app", "in", name))
 
@@ -450,7 +456,7 @@ def cmd_check(env, args):
     for k, v in data.items():
         n = len(v) if isinstance(v, list) else (1 if v else 0)
         print(f"{k:22} {n}")
-    for name in ("square_day_cat.json", "square_mix.json", "payroll_lines.json", "drawers.json", "timeclock.json", "tiles.json", "brief.json", "brief_gm.json", "tasks_launchpad.json"):
+    for name in INBOX_NAMES:
         p = bk(env, "data", "feed", "app", "in", name)
         print(f"  in/{name:22} {'found, ' + datetime.fromtimestamp(p.stat().st_mtime).strftime('%b %d %H:%M') if p.exists() else 'missing'}")
     if args.out:
@@ -603,15 +609,50 @@ def cmd_backup(env, args):
     print("backup:", summary)
 
 
+def cmd_stage(env, args):
+    """The morning runs save JSON to their scratchpad; this puts it in the inbox push reads (one permission entry for everything)."""
+    inbox_dir = bk(env, "data", "feed", "app", "in")
+    inbox_dir.mkdir(parents=True, exist_ok=True)
+    staged = []
+    def put(name, doc):
+        tmp = inbox_dir / (name + ".tmp")
+        tmp.write_text(json.dumps(doc))
+        tmp.replace(inbox_dir / name)
+        staged.append(f"{name} ({len(doc) if isinstance(doc, (list, dict)) else 1})")
+    for f in args.files:
+        name = Path(f).name
+        if name not in INBOX_NAMES:
+            sys.exit(f"stage: {name} is not an inbox file; expected one of: {', '.join(INBOX_NAMES)}")
+        try:
+            doc = json.loads(Path(f).read_text())
+        except (OSError, ValueError) as e:
+            sys.exit(f"stage: {f} is not readable JSON ({e})")
+        put(name, doc)
+    if args.tasks:
+        d = Path(args.tasks)
+        d = d / "tasks" if (d / "tasks").is_dir() else d
+        docs = [dict(read_json(p, {}) or {}, id=p.stem) for p in sorted(d.glob("*.json"))]
+        if not docs:
+            sys.exit(f"stage: no task files in {d}")
+        put("tasks_launchpad.json", docs)
+    if not staged:
+        sys.exit("stage: name the files to stage, or --tasks DIR")
+    print("staged:", "; ".join(staged), "->", inbox_dir)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("command", choices=["push", "export", "backup", "check"])
+    ap.add_argument("command", choices=["push", "export", "backup", "check", "stage"])
+    ap.add_argument("files", nargs="*", help="stage: JSON files named like the inbox files (square_day_cat.json, tiles.json, ...)")
+    ap.add_argument("--tasks", help="stage: folder of launch pad task docs (ArtifactData out_dir, <id>.json each)")
     ap.add_argument("--out", help="check: also write the payloads here (keep it outside the repo: it is real data)")
     args = ap.parse_args()
     env = settings()
     if args.out and Path(args.out).resolve().is_relative_to(HERE.parent):
         sys.exit("--out must be outside the repo (the payloads are real data)")
-    {"push": cmd_push, "export": cmd_export, "backup": cmd_backup, "check": cmd_check}[args.command](env, args)
+    if args.command != "stage" and (args.files or args.tasks):
+        sys.exit("file arguments and --tasks go with stage only")
+    {"push": cmd_push, "export": cmd_export, "backup": cmd_backup, "check": cmd_check, "stage": cmd_stage}[args.command](env, args)
 
 
 if __name__ == "__main__":
