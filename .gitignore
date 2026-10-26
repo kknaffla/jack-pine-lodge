@@ -1,0 +1,10 @@
+# Public repo: code only. Never data, keys or screenshots of real screens.
+feed/feed.env
+feed/*.env
+!feed/feed.env.example
+tests/out/
+.venv*/
+__pycache__/
+*.pyc
+.DS_Store
+tests/fixtures/
