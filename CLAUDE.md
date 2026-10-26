@@ -38,5 +38,6 @@ One web app for Jack Pine Lodge (lodge, cabins, campground, kitchen, golf course
 - ✅ Logins: Kevin (kevin), the feed (kknaffla+jplfeed@gmail.com, role feed; password only in feed/feed.env), Nick (nick). Pete: none yet (Kevin codes Pete's cards for now).
 - ✅ Feed live: push, export, backup and stage all run on real files (1,028 charges, 3,697 sales day×category rows, timecards, drawers, briefs, launch pad tasks). Second push is idempotent.
 - ✅ Screens for Kevin pass on real data; headless tests 104 pass at 390/1280 px. Reopening while signed in works (fixed Oct 26: SIGNED_IN + INITIAL_SESSION started the app twice).
-- ⬜ Morning runs wired (commands sent to session local_c863bd6b Oct 26; Kevin approves the edits and the permission entry). Until then the app's data is only as fresh as the last manual push.
+- ✅ Morning runs wired: the four jack-pine scheduled tasks stage and push (Oct 26, Kevin approved).
+- ⬜ First scheduled push and backup: the Oct 26 4:06 PM runs waited on approval prompts. Check More → Backup and feed log after the next 6:15 run.
 - Note: Supabase's built-in email reaches only the org's members (Kevin). Nick and Pete change passwords in More → Change password.
