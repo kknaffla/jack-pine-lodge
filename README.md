@@ -79,7 +79,7 @@ Inputs: the bookkeeping tool's own files (`data/feed/...`, `data/camplife/...`, 
 
 ## Part D: Phones
 
-Open the site in Safari, sign in, then Share → Add to Home Screen. Nick and Pete change their temporary password with **Forgot password?**.
+Open the site in Safari, sign in, then Share → Add to Home Screen. Nick and Pete change their temporary password in **More → Change password**. (Forgot password? emails reach only Kevin: Supabase's built-in email sends only to the organization's own members.)
 
 ---
 

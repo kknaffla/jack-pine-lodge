@@ -130,6 +130,9 @@ with sync_playwright() as pw:
         visit(p, "cards", f"nick-{W}-cards-redirect")
         check(p.locator("h1:text-is('Today'), h1").first.inner_text() != "Cards review", f"nick {W}: Cards review not offered")
         visit(p, "more", f"nick-{W}-more")
+        p.fill("#pwChange input[name=pw]", "new-password-1"); p.fill("#pwChange input[name=pw2]", "new-password-1")
+        p.click("#pwChange button[type=submit]"); p.wait_for_timeout(200)
+        check(p.locator("text=Password changed").count() > 0, f"nick {W}: changes his password from More")
         ctx.close()
         # ---------------- Pete
         ctx, p = open_page(b, "pete", vp, logged_in=True)

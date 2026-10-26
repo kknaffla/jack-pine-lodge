@@ -271,12 +271,24 @@
       <h2>Appearance <span class="sub">this device only</span></h2>
       <div class="seg" role="radiogroup" aria-label="Appearance">${[['auto', 'Match phone'], ['light', 'Light'], ['dark', 'Dark']].map(([k, l]) => `<button type="button" role="radio" aria-checked="${th === k}" class="${th === k ? 'on' : ''}" data-theme-pick="${k}">${l}</button>`).join('')}</div>
       <h2>Account</h2>
-      <section class="card"><p class="small">Signed in as <b>${esc(me.display_name || '')}</b> (${esc(A.state.session.user.email)}).</p><p class="small muted">To change your password, sign out and use Forgot password.</p><button id="signOut">Sign out</button></section>
+      <section class="card"><p class="small">Signed in as <b>${esc(me.display_name || '')}</b> (${esc(A.state.session.user.email)}).</p><button id="signOut">Sign out</button></section>
+      <section class="card"><form id="pwChange"><label class="f">New password<input type="password" name="pw" minlength="10" required autocomplete="new-password"></label>
+        <label class="f">Same again<input type="password" name="pw2" minlength="10" required autocomplete="new-password"></label>
+        <button class="primary" type="submit">Change password</button></form></section>
       <p class="tiny muted center">Version ${esc(A.APP_VERSION)}</p>`;
   };
   A.wires.more = function (root) {
     root.querySelectorAll('[data-theme-pick]').forEach((b) => b.addEventListener('click', () => { A.applyTheme(b.dataset.themePick); A.render(); }));
     const so = root.querySelector('#signOut'); if (so) so.addEventListener('click', A.signOut);
+    const pf = root.querySelector('#pwChange');
+    if (pf) pf.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (pf.pw.value !== pf.pw2.value) { toast('The two passwords differ'); return; }
+      const btn = pf.querySelector('button'); btn.disabled = true;
+      const { error } = await A.db().auth.updateUser({ password: pf.pw.value });
+      btn.disabled = false;
+      if (error) toast(error.message); else { pf.reset(); toast('Password changed'); }
+    });
   };
 
   // ------------------------------------------------------------ Backup + feed log (Kevin)
