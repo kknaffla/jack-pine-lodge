@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const APP_VERSION = '2026.10.26-3'; // keep in sync with the ?v= tags in index.html
+  const APP_VERSION = '2026.10.26-4'; // keep in sync with the ?v= tags in index.html
   const CFG = window.APP_CONFIG || {};
   const TZ = CFG.TIME_ZONE || 'America/Detroit';
   const $app = document.getElementById('app');
@@ -322,9 +322,12 @@
   }
   A.signOut = signOut;
 
+  A.trace = [];
   async function start() {
+    A.trace.push('start ' + Math.round(performance.now()));
     state.data = {}; state.errors = {};
     await load('members');
+    A.trace.push('members ' + D('members').length + ' ' + (state.errors.members || '') + ' ' + Math.round(performance.now()));
     if (state.errors.members) {
       $app.innerHTML = `<div class="login card"><h1>Can't load</h1><p class="small">${esc(state.errors.members)}</p><button id="retry" class="primary">Try again</button> <button id="signOut">Sign out</button></div>`;
       document.getElementById('retry').onclick = start;
@@ -344,6 +347,7 @@
     sb = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
     let recovering = false;
     sb.auth.onAuthStateChange((event, session) => {
+      A.trace.push(event + ' ' + !!session + ' ' + Math.round(performance.now()));
       if (event === 'PASSWORD_RECOVERY') { recovering = true; state.session = session; viewLogin('recover'); return; }
       const prev = state.session && state.session.user.id;
       state.session = session;
