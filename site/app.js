@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const APP_VERSION = '2026.10.26-4'; // keep in sync with the ?v= tags in index.html
+  const APP_VERSION = '2026.10.26-5'; // keep in sync with the ?v= tags in index.html
   const CFG = window.APP_CONFIG || {};
   const TZ = CFG.TIME_ZONE || 'America/Detroit';
   const $app = document.getElementById('app');
@@ -121,7 +121,8 @@
   async function load(key) {
     if (state.loading[key]) return state.loading[key];
     state.loading[key] = (async () => {
-      try { state.data[key] = await LOADERS[key](); delete state.errors[key]; }
+      // Await first, then write: start() may have swapped in a fresh state.data meanwhile.
+      try { const rows = await LOADERS[key](); state.data[key] = rows; delete state.errors[key]; }
       catch (e) { console.error(key, e); state.errors[key] = e.message || String(e); state.data[key] = state.data[key] || []; }
       finally { delete state.loading[key]; }
     })();
@@ -322,12 +323,9 @@
   }
   A.signOut = signOut;
 
-  A.trace = [];
   async function start() {
-    A.trace.push('start ' + Math.round(performance.now()));
     state.data = {}; state.errors = {};
     await load('members');
-    A.trace.push('members ' + D('members').length + ' ' + (state.errors.members || '') + ' ' + Math.round(performance.now()));
     if (state.errors.members) {
       $app.innerHTML = `<div class="login card"><h1>Can't load</h1><p class="small">${esc(state.errors.members)}</p><button id="retry" class="primary">Try again</button> <button id="signOut">Sign out</button></div>`;
       document.getElementById('retry').onclick = start;
@@ -346,8 +344,8 @@
     }
     sb = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
     let recovering = false;
+    let startTimer = null; // reopening a saved session sends SIGNED_IN and INITIAL_SESSION together: start once
     sb.auth.onAuthStateChange((event, session) => {
-      A.trace.push(event + ' ' + !!session + ' ' + Math.round(performance.now()));
       if (event === 'PASSWORD_RECOVERY') { recovering = true; state.session = session; viewLogin('recover'); return; }
       const prev = state.session && state.session.user.id;
       state.session = session;
@@ -355,7 +353,7 @@
       if (recovering) return;
       if (event === 'SIGNED_IN' && prev === session.user.id && state.me) return; // token refresh / tab refocus
       if (event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') return;
-      setTimeout(start, 0);
+      clearTimeout(startTimer); startTimer = setTimeout(start, 0);
     });
     window.addEventListener('hashchange', render);
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && state.me) scheduleReload(Object.keys(state.data).filter((k) => k !== 'members')); });

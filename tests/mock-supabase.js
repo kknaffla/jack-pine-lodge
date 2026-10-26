@@ -54,7 +54,8 @@
           }
           if (op === 'delete') { DB[table] = rows.filter((r) => !match(r)); data = []; }
         }
-        return Promise.resolve({ data, error: null }).then(res, rej);
+        // A little network delay, so overlapping loads overlap here too.
+        return new Promise((ok) => setTimeout(() => ok({ data, error: null }), 15)).then(res, rej);
       }
     };
     return api;
@@ -66,7 +67,11 @@
       async createSignedUrl(path) { const f = (window.__FILES__ || {})[path]; return { data: { signedUrl: f ? URL.createObjectURL(f) : 'data:image/gif;base64,R0lGODlhAQABAAAAACw=' }, error: null }; }
     }; } },
     auth: {
-      onAuthStateChange(cb) { listeners.push(cb); setTimeout(() => cb('INITIAL_SESSION', window.__LOGGED_IN__ ? { user: me } : null), 0); return { data: { subscription: { unsubscribe() {} } } }; },
+      onAuthStateChange(cb) {
+        listeners.push(cb);
+        // Like supabase-js reopening a saved session: SIGNED_IN, then INITIAL_SESSION, in the same tick.
+        setTimeout(() => { if (window.__LOGGED_IN__) cb('SIGNED_IN', { user: me }); cb('INITIAL_SESSION', window.__LOGGED_IN__ ? { user: me } : null); }, 0);
+        return { data: { subscription: { unsubscribe() {} } } }; },
       async signInWithPassword() { listeners.forEach((cb) => cb('SIGNED_IN', { user: me })); return { error: null }; },
       async signOut() { listeners.forEach((cb) => cb('SIGNED_OUT', null)); return { error: null }; },
       async resetPasswordForEmail() { return { error: null }; }, async updateUser() { return { error: null }; }
