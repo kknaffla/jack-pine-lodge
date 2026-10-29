@@ -3,7 +3,7 @@
 Claude Code reads this file automatically.
 
 ## What this is
-One web app for Jack Pine Lodge (lodge, cabins, campground, kitchen, golf course) replacing the claude.ai pages: Nick's desk and card charges (stage 1), Pete's card charges and Kevin's Launch Pad, Feed Review and Performance (stage 2). Plan: https://claude.ai/artifact/SiRhvRfoL2gDtcsWik5bcr. Built like Lily's app in `~/Projects/college-plan`.
+One web app for Jack Pine Lodge (lodge, cabins, campground, kitchen, golf course) replacing the claude.ai pages: Nick's desk and card charges (stage 1), Pete's card charges and Kevin's Launch Pad, Feed Review and Performance (stage 2). Plan: https://claude.ai/artifact/SiRhvRfoL2gDtcsWik5bcr. Built like Lily's app in `~/Projects/knaffla-family/college-plan`.
 - Kevin (owner) is a career CFO: few words, real numbers. Do the literal ask; offer anything extra.
 - The old pages keep running until Kevin retires them page by page. Deleting anything needs Kevin's yes.
 - No QuickBooks or Square writes, ever, from here. Recodes wait for Kevin's yes in the bookkeeping session.
